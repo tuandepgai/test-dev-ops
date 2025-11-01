@@ -4,9 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'develop',
-                    url: 'https://github.com/tuandepgai/test-dev-ops.git',
-                    credentialsId: 'a2ab45ac-b3cf-4ad0-8e0e-c678fe8eee0c'
+                git branch: 'develop', credentialsId: 'a2ab45ac-b3cf-4ad0-8e0e-c678fe8eee0c', url: 'https://github.com/tuandepgai/test-dev-ops.git'
             }
         }
 
