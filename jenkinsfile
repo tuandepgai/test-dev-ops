@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "tuan-app"
+        IMAGE_TAG = "latest"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "📦 Cloning source code..."
+                git branch: 'develop', url: 'https://github.com/tuandepgai/test-dev-ops'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "🏗️ Building Gradle project..."
+                sh './gradlew clean build -x test'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "🐳 Building Docker image..."
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                echo "🚀 Deploying container..."
+                // Stop old container if exists
+                sh 'docker rm -f ${IMAGE_NAME} || true'
+                // Run new container
+                sh 'docker run -d --name ${IMAGE_NAME} -p 8080:8080 ${IMAGE_NAME}:${IMAGE_TAG}'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline executed successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed!"
+        }
+    }
+}
