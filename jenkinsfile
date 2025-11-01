@@ -14,17 +14,6 @@ pipeline {
             }
         }
 
-         stage('Install JDK 17') {
-                    steps {
-                        echo "☕ Installing JDK 17..."
-                        sh '''
-                        apt-get update
-                        apt-get install -y openjdk-17-jdk
-                        java -version
-                        '''
-                    }
-                }
-
         stage('Build') {
             steps {
                 echo "🏗️ Building Gradle project..."
