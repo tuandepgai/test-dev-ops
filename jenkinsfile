@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush() // trigger tự động khi GitHub push
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -22,7 +26,10 @@ pipeline {
 
         stage('Run Container') {
             steps {
-                sh 'docker run -d --name tuan-app -p 8080:8080 tuan-app'
+                sh '''
+                docker rm -f tuan-app || true  # xóa container cũ nếu có
+                docker run -d --name tuan-app -p 8080:8080 tuan-app
+                '''
             }
         }
     }
