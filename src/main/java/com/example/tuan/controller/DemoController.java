@@ -13,4 +13,9 @@ public class DemoController {
     public ResponseEntity<String> test() {
         return ResponseEntity.ok("Hello World");
     }
+
+    @GetMapping("/jenkins/test")
+    public ResponseEntity<String> jenkinsTest() {
+        return ResponseEntity.ok("Jenkins auto build ci cd test ok");
+    }
 }
