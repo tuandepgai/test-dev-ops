@@ -1,5 +1,9 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:21-jdk-jammy
+
+# Set the working directory inside the container
 WORKDIR /app
-COPY build/libs/*.jar tuan-0.0.1-SNAPSHOT.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "tuan-0.0.1-SNAPSHOT.jar"]
+
+COPY build/libs/*.jar app.jar
+
+# run app
+ENTRYPOINT ["java", "-jar", "app.jar"]
