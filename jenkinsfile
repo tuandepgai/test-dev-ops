@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     triggers {
-        githubPush() // trigger tự động khi GitHub push
+        githubPush()
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'develop', url: 'https://github.com/tuandepgai/test-dev-ops.git'
+                git branch: 'main', url: 'https://github.com/tuandepgai/test-dev-ops.git'
             }
         }
 
@@ -20,16 +20,15 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t tuan-app .'
+                // Nếu Jenkins chạy cùng Minikube
+                sh 'eval $(minikube -p minikube docker-env)'
+                sh 'docker build -t tuan-app:latest .'
             }
         }
 
-        stage('Run Container') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                docker rm -f tuan-app || true  # xóa container cũ nếu có
-                docker run -d --name tuan-app -p 8080:8080 tuan-app
-                '''
+                sh 'kubectl apply -f src/main/resources/config/k8s-deploy.yaml'
             }
         }
     }
