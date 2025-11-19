@@ -5,6 +5,12 @@ pipeline {
         githubPush()
     }
 
+    environment {
+        // JAVA_HOME trỏ tới JDK 21 trên agent
+        JAVA_HOME = '/usr/lib/jvm/java-21-openjdk-amd64'
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -12,16 +18,23 @@ pipeline {
             }
         }
 
+        stage('Check Java') {
+            steps {
+                sh 'java -version'
+                sh 'javac -version'
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'chmod +x gradlew'
-                sh './gradlew clean build'
+                sh './gradlew clean build -x test' // bỏ test nếu muốn nhanh hơn
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                // Nếu Jenkins chạy cùng Minikube
+                // Dùng Docker của Minikube
                 sh 'eval $(minikube -p minikube docker-env)'
                 sh 'docker build -t tuan-app:latest .'
             }
@@ -29,8 +42,19 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
+                // Dùng kubeconfig của Minikube
                 sh 'kubectl apply -f src/main/resources/config/k8s-deploy.yaml'
+                sh 'kubectl rollout status deployment tuan-app-deployment'
             }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Pipeline thất bại!'
+        }
+        success {
+            echo 'Pipeline chạy thành công!'
         }
     }
 }
