@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/tuandepgai/test-dev-ops.git'
+                git branch: 'develop', url: 'https://github.com/tuandepgai/test-dev-ops.git'
             }
         }
 
