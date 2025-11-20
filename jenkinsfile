@@ -34,9 +34,7 @@ pipeline {
 
       stage('Build Docker Image') {
           steps {
-              // Load Docker của Minikube
-              sh 'eval $(minikube -p minikube docker-env)'
-              sh 'docker build -t tuan-app:latest .'
+              bat 'docker build -t tuan-app:latest .'
           }
       }
 
