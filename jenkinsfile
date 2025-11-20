@@ -34,9 +34,16 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                // Dùng Docker của Minikube
-                sh 'eval $(minikube -p minikube docker-env)'
-                sh 'docker build -t tuan-app:latest .'
+                script {
+                    // Nếu chưa có profile, start Minikube
+                    sh 'minikube start -p minikube --driver=docker || true'
+
+                    // Dùng Docker của Minikube
+                    sh 'eval $(minikube -p minikube docker-env)'
+
+                    // Build image
+                    sh 'docker build -t tuan-app:latest .'
+                }
             }
         }
 
