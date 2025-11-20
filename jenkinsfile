@@ -33,19 +33,12 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
-                script {
-                    // Nếu chưa có profile, start Minikube
-                    sh 'minikube start -p minikube --driver=docker || true'
-
-                    // Dùng Docker của Minikube
-                    sh 'eval $(minikube -p minikube docker-env)'
-
-                    // Build image
-                    sh 'docker build -t tuan-app:latest .'
-                }
-            }
-        }
+                   steps {
+                       // Dùng docker của Minikube host
+                       sh 'eval $(minikube -p minikube docker-env)'
+                       sh 'docker build -t tuan-app:latest .'
+                   }
+               }
 
         stage('Deploy to Kubernetes') {
             steps {
