@@ -13,34 +13,31 @@ pipeline {
             }
         }
 
-        stage('Check Java') {
-            steps {
-                bat 'java -version'
-                bat 'javac -version'
-            }
-        }
+       stage('Check Java') {
+           steps {
+               sh 'java -version'
+               sh 'javac -version'
+           }
+       }
 
-        stage('Build') {
-            steps {
-                bat 'gradlew clean build -x test'
-            }
-        }
+       stage('Build') {
+           steps {
+               sh './gradlew clean build -x test'
+           }
+       }
 
-        stage('Build Docker Image') {
-            steps {
-                // dùng Minikube Docker daemon
-                bat 'minikube -p minikube docker-env --shell powershell | Invoke-Expression'
-                bat 'docker build -t tuan-app:latest .'
-            }
-        }
+       stage('Build Docker Image') {
+           steps {
+               sh 'docker build -t tuan-app:latest .'
+           }
+       }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                // chạy kubectl qua Minikube
-                bat 'minikube -p minikube kubectl -- apply -f src\\main\\resources\\config\\k8s-deploy.yaml'
-                bat 'minikube -p minikube kubectl -- rollout status deployment tuan-app-deployment'
-            }
-        }
+       stage('Deploy to Kubernetes') {
+           steps {
+               sh 'kubectl apply -f src/main/resources/config/k8s-deploy.yaml'
+           }
+       }
+
     }
 
     post {
