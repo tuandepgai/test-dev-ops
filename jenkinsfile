@@ -1,14 +1,9 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()
-    }
-
     environment {
-        // JAVA_HOME trỏ tới JDK 21 trên agent
-        JAVA_HOME = "/opt/java/openjdk"
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+        JAVA_HOME = "C:/Program Files/Java/jdk-21" // sửa theo JDK 21 trên host Windows
+        PATH = "${JAVA_HOME}/bin;${env.PATH}"
     }
 
     stages {
@@ -20,29 +15,30 @@ pipeline {
 
         stage('Check Java') {
             steps {
-                sh 'java -version'
-                sh 'javac -version'
+                bat 'java -version'
+                bat 'javac -version'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'chmod +x gradlew'
-                sh './gradlew clean build -x test' // bỏ test nếu muốn nhanh hơn
+                bat 'gradlew clean build -x test'
             }
         }
 
-      stage('Build Docker Image') {
-          steps {
-              sh 'docker build -t tuan-app:latest .'
-          }
-      }
+        stage('Build Docker Image') {
+            steps {
+                // dùng Minikube Docker daemon
+                bat 'minikube -p minikube docker-env --shell powershell | Invoke-Expression'
+                bat 'docker build -t tuan-app:latest .'
+            }
+        }
 
         stage('Deploy to Kubernetes') {
             steps {
-                // Dùng kubeconfig của Minikube
-                sh 'kubectl apply -f src/main/resources/config/k8s-deploy.yaml'
-                sh 'kubectl rollout status deployment tuan-app-deployment'
+                // chạy kubectl qua Minikube
+                bat 'minikube -p minikube kubectl -- apply -f src\\main\\resources\\config\\k8s-deploy.yaml'
+                bat 'minikube -p minikube kubectl -- rollout status deployment tuan-app-deployment'
             }
         }
     }
