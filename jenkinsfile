@@ -39,9 +39,10 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                // Dùng kubeconfig của Minikube
-                sh 'kubectl apply -f src/main/resources/config/k8s-deploy.yaml'
-                sh 'kubectl rollout status deployment tuan-app-deployment'
+                withEnv(["KUBECONFIG=/var/jenkins_home/.kube/config"]) {
+                    sh 'kubectl apply -f src/main/resources/config/k8s-deploy.yaml'
+                    sh 'kubectl rollout status deployment tuan-app-deployment'
+                }
             }
         }
     }
