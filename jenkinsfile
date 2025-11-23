@@ -27,7 +27,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'chmod +x gradlew'
-                sh './gradlew clean build -x test' // bỏ test nếu muốn nhanh hơn
+                sh './gradlew clean build -x test'
             }
         }
 
