@@ -40,7 +40,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 withEnv(["KUBECONFIG=/var/jenkins_home/.kube/config"]) {
-                    sh 'kubectl apply -f /app/config/k8s-deploy.yaml --insecure-skip-tls-verify'
+                    sh "kubectl apply -f /app/config/k8s-deploy.yaml --validate=false"
                     sh 'kubectl rollout status deployment tuan-app-deployment'
                 }
             }
