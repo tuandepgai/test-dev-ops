@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: tuan-app
-          image: tuan-app:latest
+          image: localhost:5000/tuan-app:6ec31f4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
