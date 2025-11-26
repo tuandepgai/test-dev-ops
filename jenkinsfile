@@ -8,7 +8,7 @@ pipeline {
     environment {
         JAVA_HOME = "/opt/java/openjdk"
         PATH = "${JAVA_HOME}/bin:${env.PATH}"
-        REGISTRY = "localhost:5000"
+        REGISTRY = "malaya-subnutritious-imperturbably.ngrok-free.dev"
         IMAGE_NAME = "tuan-app"
     }
 
