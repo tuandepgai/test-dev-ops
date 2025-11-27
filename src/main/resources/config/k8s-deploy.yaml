@@ -5,7 +5,7 @@ metadata:
   labels:
     app: tuan-app
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tuan-app
@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: tuan-app
-          image: malaya-subnutritious-imperturbably.ngrok-free.dev/tuan-app:060a115
-          imagePullPolicy: IfNotPresent
+          image: malaya-subnutritious-imperturbably.ngrok-free.dev/tuan-app:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
 ---
