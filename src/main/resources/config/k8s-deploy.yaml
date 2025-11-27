@@ -17,7 +17,7 @@ spec:
       containers:
         - name: tuan-app
           image: malaya-subnutritious-imperturbably.ngrok-free.dev/tuan-app:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
 ---
