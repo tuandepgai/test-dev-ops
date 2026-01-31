@@ -1,0 +1,81 @@
+pipeline {
+    agent any
+
+    triggers {
+        githubPush()
+    }
+
+    environment {
+        JAVA_HOME = "/opt/java/openjdk"
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+        REGISTRY = "malaya-subnutritious-imperturbably.ngrok-free.dev"
+        IMAGE_NAME = "tuan-app"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'develop', url: 'https://github.com/tuandepgai/test-dev-ops.git'
+                sh 'git log -1 --oneline'
+            }
+        }
+
+        stage('Check Java') {
+            steps {
+                sh 'java -version'
+                sh 'javac -version'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'chmod +x gradlew'
+                sh './gradlew clean build -x test'
+            }
+        }
+
+        stage('Build & Push Docker Image') {
+            steps {
+                script {
+
+                    def GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    echo "Building Docker image for commit: ${GIT_COMMIT}"
+
+                    // Build Docker image từ Dockerfile
+                    sh """
+                        docker build -t ${REGISTRY}/${IMAGE_NAME}:${GIT_COMMIT} .
+                        docker tag ${REGISTRY}/${IMAGE_NAME}:${GIT_COMMIT} ${REGISTRY}/${IMAGE_NAME}:latest
+                        docker push ${REGISTRY}/${IMAGE_NAME}:${GIT_COMMIT}
+                        docker push ${REGISTRY}/${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                withEnv(["KUBECONFIG=/var/jenkins_home/.kube/config"]) {
+                    script {
+                        def GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+
+                        // Cập nhật image tag trong YAML trước khi apply
+                        sh """
+                            sed -i 's|image:.*|image: ${REGISTRY}/${IMAGE_NAME}:${GIT_COMMIT}|' /app/config/k8s-deploy.yaml
+                            kubectl apply -f /app/config/k8s-deploy.yaml --validate=false
+                            kubectl rollout status deployment tuan-app-deployment
+                        """
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Pipeline thất bại!'
+        }
+        success {
+            echo 'Pipeline chạy thành công!'
+        }
+    }
+}
